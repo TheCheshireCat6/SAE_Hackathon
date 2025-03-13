@@ -1,4 +1,5 @@
 data/Liao_Dataset/
+data/enformer_data_npz/
 SpliceAI_Models/
 logs/
 out/
