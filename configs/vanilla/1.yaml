@@ -1,0 +1,6 @@
+# Vanilla SAE with middle transformer layer
+hook_layer: transformer.5
+act_size: 1536
+dict_size: 3072
+l1_coeff: 0.02
+lr: 2e-4 

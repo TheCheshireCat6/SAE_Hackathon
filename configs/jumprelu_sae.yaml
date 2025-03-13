@@ -1,0 +1,6 @@
+# JumpReLU SAE configuration
+sae_type: jumprelu
+l1_coeff: 0.1
+dict_size: 1024
+act_size: 64
+bandwidth: 0.001 

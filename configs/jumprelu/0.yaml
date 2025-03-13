@@ -1,0 +1,7 @@
+# JumpReLU SAE with early transformer layer
+hook_layer: transformer.0
+act_size: 1536
+dict_size: 2048
+l1_coeff: 0.01
+bandwidth: 0.001
+lr: 3e-4 

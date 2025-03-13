@@ -1,0 +1,4 @@
+wsets: [11]
+dsets: [1]
+hook_point: "output megablocks.0.megablock.2.block"
+h5_file: SpliceAI_Models/SpliceNet80_g1.h5 
