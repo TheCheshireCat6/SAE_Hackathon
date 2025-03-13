@@ -1,0 +1,69 @@
+parser = argparse.ArgumentParser()
+    #General training parameters
+    parser.add_argument('--seed', type=int, default=49, help='Random seed for reproducibility')
+    parser.add_argument('--batch-size', type=int, default=4096, help='Batch size for training')
+    parser.add_argument('--lr', type=float, default=3e-4, help='Learning rate')
+    parser.add_argument('--l1-coeff', type=float, default=0, help='L1 regularization coefficient')
+    parser.add_argument('--beta1', type=float, default=0.9, help='Beta1 parameter for Adam optimizer')
+    parser.add_argument('--beta2', type=float, default=0.99, help='Beta2 parameter for Adam optimizer')
+    parser.add_argument('--max-grad-norm', type=float, default=100000, help='Maximum gradient norm for clipping')
+    parser.add_argument('--act-size', type=int, default=768, help='Size of activation vectors')
+    parser.add_argument('--dict-size', type=int, default=12288, help='Size of the learned dictionary')
+    parser.add_argument('--wandb-project', type=str, default='sparse_autoencoders', help='Weights & Biases project name')
+    parser.add_argument('--input-unit-norm', action='store_true', help='Whether input embeddings are normalized to unit norm')
+    parser.add_argument('--perf-log-freq', type=int, default=1000, help='Frequency of performance logging')
+    parser.add_argument('--sae-type', type=str, default='topk', help='Type of sparse autoencoder (topk, vanilla, jumprelu, or batch_topk)')
+    parser.add_argument('--checkpoint-freq', type=int, default=10000, help='Frequency of model checkpointing')
+    parser.add_argument('--n-batches-to-dead', type=int, default=5, help='Number of batches before considering a feature dead')
+    parser.add_argument('--accelerator', type=str, default='auto', help='Accelerator type (cpu, gpu, etc)')
+    parser.add_argument('--devices', type=str, default='auto', help='Device configuration')
+    parser.add_argument('--no-checkpointing', action='store_false', dest='include_checkpointing', help='Disable model checkpointing')
+    parser.add_argument('--no-early-stopping', action='store_false', dest='include_early_stopping', help='Disable early stopping')
+    parser.add_argument('--no-lr-tracking', action='store_false', dest='track_LR', help='Disable learning rate change tracking')
+    parser.add_argument('--epochs', type=int, default=1000, help='maximum number of training epochs')
+    parser.add_argument('--outpath', type=str, default='./out/', help='Output directory path')
+    #Warmstart parameters
+    parser.add_argument('--warmstart-batches', type=int, default=0, help='Number of warmstart batches')
+    parser.add_argument('--warmstart-start-factor', type=float, default=0.0001, help='Initial factor for warmstart')
+    parser.add_argument('--warmstart-end-factor', type=float, default=1, help='Final factor for warmstart')
+    #Learning rate scheduler parameters
+    parser.add_argument('--scheduler', type=str, choices=['none','RedOnPlateau', 'CosineAnnealing','OneCycleLR'], default='RedOnPlateau', help='Learning rate scheduler type')
+    parser.add_argument('--weight-decay', type=float, default=0.0001, help='Weight decay for optimizer')
+    #ReduceLROnPlateau parameters
+    parser.add_argument('--reduceLROnPlateau-factor', type=float, default=0.1, help='Factor by which to reduce learning rate')
+    parser.add_argument('--reduceLROnPlateau-patience', type=int, default=4, help='Patience for learning rate scheduler')
+    parser.add_argument('--reduceLROnPlateau-threshold', type=float, default=0.0001, help='Threshold for learning rate scheduler')
+    parser.add_argument('--reduceLROnPlateau-cooldown', type=int, default=0, help='Cooldown period for learning rate scheduler')
+    parser.add_argument('--reduceLROnPlateau-min', type=float, default=0, help='Minimum learning rate')
+    parser.add_argument('--reduceLROnPlateau-eps', type=float, default=1e-08, help='Epsilon for learning rate scheduler')
+    #Early stopping parameters
+    parser.add_argument('--min-delta', type=float, default=0, help='Minimum change in monitored quantity for early stopping')
+    parser.add_argument('--patience', type=int, default=10, help='Patience for early stopping')
+
+
+    # (Batch)TopKSAE specific
+    parser.add_argument('--top-k', type=int, default=32, help='Number of top activations to keep')
+    parser.add_argument('--top-k-aux', type=int, default=512, help='Number of top activations for auxiliary loss')
+    parser.add_argument('--aux-penalty', type=float, default=1/32, help='Penalty coefficient for auxiliary loss')
+
+    # for jumprelu
+    parser.add_argument('--bandwidth', type=float, default=0.001, help='Bandwidth parameter for JumpReLU activation')
+
+    # Enformer specific
+    parser.add_argument('--data-path', type=str, default='../enformer_data_npz', 
+                        help='Base directory containing the Enformer data files')
+    parser.add_argument('--train-data-path', type=str, default=None,
+                        help='Path to training data files (defaults to data-path if not specified)')
+    parser.add_argument('--val-data-path', type=str, default=None, 
+                        help='Path to validation data files (defaults to data-path if not specified)')
+    parser.add_argument('--test-data-path', type=str, default=None,
+                        help='Path to test data files (defaults to data-path if not specified)')
+    parser.add_argument('--data-batch-size', type=int, default=32,
+                        help='Batch size for data loading and activation extraction')
+    parser.add_argument('--num-workers', type=int, default=4, 
+                        help='Number of workers for data loading')
+    parser.add_argument('--hook-layer', type=str, default='conv_tower.5.2.to_attn_logits', 
+                        help='Layer to extract activations from (e.g., transformer.0, conv_tower.5.2.to_attn_logits)')
+    parser.add_argument('--preload-activations', action='store_true',
+                        help='Preload all activations before training (uses more memory but faster)')
+    
