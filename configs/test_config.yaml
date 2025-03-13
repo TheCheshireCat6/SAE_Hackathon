@@ -1,0 +1,62 @@
+# General training parameters
+seed: 49
+batch_size: 4096
+lr: 3e-4
+l1_coeff: 0
+beta1: 0.9
+beta2: 0.99
+max_grad_norm: 100000
+act_size: 768
+dict_size: 12288
+wandb_project: sparse_autoencoders
+input_unit_norm: false
+perf_log_freq: 1000
+sae_type: topk
+checkpoint_freq: 10000
+n_batches_to_dead: 5
+accelerator: auto
+devices: auto
+include_checkpointing: true
+include_early_stopping: true
+track_LR: true
+epochs: 1000
+outpath: ./out/
+
+# Warmstart parameters
+warmstart_batches: 0
+warmstart_start_factor: 0.0001
+warmstart_end_factor: 1
+
+# Learning rate scheduler parameters
+scheduler: RedOnPlateau  # One of: none, RedOnPlateau, CosineAnnealing, OneCycleLR
+weight_decay: 0.0001
+
+# ReduceLROnPlateau parameters
+reduceLROnPlateau_factor: 0.1
+reduceLROnPlateau_patience: 4
+reduceLROnPlateau_threshold: 0.0001
+reduceLROnPlateau_cooldown: 0
+reduceLROnPlateau_min: 0
+reduceLROnPlateau_eps: 1e-08
+
+# Early stopping parameters
+min_delta: 0
+patience: 10
+
+# TopKSAE specific
+top_k: 32
+top_k_aux: 512
+aux_penalty: 0.03125  # 1/32
+
+# JumpReLU specific
+bandwidth: 0.001
+
+# Enformer specific
+data_path: /grid/hackathon/data_norepl/enformer_data_npz
+train_data_path: null
+val_data_path: null
+test_data_path: null 
+data_batch_size: 32
+num_workers: 4
+hook_layer: conv_tower.5.2.to_attn_logits
+preload_activations: false 

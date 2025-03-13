@@ -1,0 +1,64 @@
+# General training parameters
+seed: 49
+batch_size: 128
+lr: 3e-4
+l1_coeff: 0.1
+beta1: 0.9
+beta2: 0.99
+max_grad_norm: 100000
+act_size: 1536
+dict_size: 4096
+wandb_project: enformer_sparse_autoencoders
+input_unit_norm: false
+perf_log_freq: 100
+sae_type: topk  # One of: topk, vanilla, jumprelu, batch_topk
+checkpoint_freq: 1000
+n_batches_to_dead: 5
+accelerator: auto
+devices: auto
+include_checkpointing: true
+include_early_stopping: true
+track_LR: true
+epochs: 50
+outpath: ./out/enformer/
+
+# Warmstart parameters
+warmstart_batches: 100
+warmstart_start_factor: 0.0001
+warmstart_end_factor: 1
+
+# Learning rate scheduler parameters
+scheduler: RedOnPlateau  # One of: none, RedOnPlateau, CosineAnnealing, OneCycleLR
+weight_decay: 0.0001
+
+# ReduceLROnPlateau parameters
+reduceLROnPlateau_factor: 0.2
+reduceLROnPlateau_patience: 3
+reduceLROnPlateau_threshold: 0.0001
+reduceLROnPlateau_cooldown: 0
+reduceLROnPlateau_min: 0
+reduceLROnPlateau_eps: 1e-08
+
+# Early stopping parameters
+min_delta: 0
+patience: 10
+
+# TopKSAE specific
+top_k: 32
+top_k_aux: 512
+aux_penalty: 0.03125  # 1/32
+
+# JumpReLU specific
+bandwidth: 0.001
+
+# Enformer specific
+enformer_dim: 1536
+hook_layer: conv_tower.5.2.to_attn_logits
+sequence_length: 196608
+target_length: 896
+npz_data_dir: ../enformer_data_npz
+max_samples: null
+val_split: 0.1
+test_split: 0.1
+num_workers: 4
+model_name: Enformer 

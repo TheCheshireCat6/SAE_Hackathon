@@ -1,0 +1,9 @@
+# TopK SAE with middle transformer layer
+hook_layer: transformer.5
+act_size: 1536
+dict_size: 3072
+l1_coeff: 0.02
+top_k: 32
+top_k_aux: 512
+aux_penalty: 0.03125  # 1/32
+lr: 2e-4 
