@@ -1,6 +1,6 @@
 # General training parameters
 seed: 49
-batch_size: 64
+batch_size: 4
 lr: 0.0003
 l1_coeff: 0
 beta1: 0.9
@@ -73,4 +73,7 @@ data_batch_size: 4
 num_workers: 4
 target_layer: transformer.10.1.fn.4
 use_gpu: true  # Whether to use GPU for inference
-preload_activations: false 
+preload_activations: false
+
+# Wandb logging configuration
+wandb_batch_log_freq: 50  # Log every 100 batches 

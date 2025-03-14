@@ -1,0 +1,7 @@
+Running with architecture: topk, config file: test_config.yaml
+Found 1356 NumPy files
+Found 291 NumPy files
+Found 290 NumPy files
+Validation: |          | 0/? [00:00<?, ?it/s][1;34mwandb[0m: 
+[1;34mwandb[0m: 🚀 View run [33mhazelnut-meringue-11[0m at: [34mhttps://wandb.ai/lemanczyk-marta/enformer_SAE/runs/t7hcfqw8[0m
+Training completed

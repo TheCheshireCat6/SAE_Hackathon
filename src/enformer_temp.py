@@ -242,11 +242,11 @@ class EnformerEmbeddingsDataLoader:
                 # Handle 3D embeddings from transformer layers
                 if len(embeddings.shape) == 3:
                     # Option 1: Take mean across sequence length (recommended)
-                    embeddings = embeddings.mean(dim=1)
+                    #embeddings = embeddings.mean(dim=1)
                     # Or Option 2: Take max across sequence length
                     # embeddings = embeddings.max(dim=1)[0]
-                    # Or Option 3: Take just the first position
-                    # embeddings = embeddings[:, 0, :]
+                    # Or Option 3: Take just the peak position
+                    embeddings = embeddings[:, int(embeddings.shape[1]/2), :]
                     
                     print(f"Processed embeddings shape: {embeddings.shape}")
             

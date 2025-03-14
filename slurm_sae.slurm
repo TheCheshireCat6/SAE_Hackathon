@@ -1,13 +1,13 @@
 #!/bin/bash
 #SBATCH --job-name=pytorch_hackathon_enformer_bteam
-#SBATCH --output=pytorch_hackathon_enformer_bteam.out
-#SBATCH --error=pytorch_hackathon_enformer_bteam.err
-#SBATCH --mem-per-cpu=1G
+#SBATCH --output=logs/pytorch_hackathon_enformer_bteam_%j.out
+#SBATCH --error=logs/pytorch_hackathon_enformer_bteam_%j.err
+#SBATCH --mem=90G
 #SBATCH --gres=gpu:1
 #SBATCH --qos=hackathon
 #SBATCH --account=hackathon_202503
-#SBATCH --time=00:05:00
-#SBATCH --cpus-per-task=2
+#SBATCH --time=06:00:00
+#SBATCH --cpus-per-task=24
 #SBATCH --mail-type=begin
 #SBATCH --mail-type=end
 #SBATCH --mail-user=lemanczyk@cshl.edu

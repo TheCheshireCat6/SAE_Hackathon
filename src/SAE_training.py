@@ -45,18 +45,23 @@ class SAETraining:
             try:
                 import wandb
                 wandb.login()
-                wandb_logger = L.loggers.WandbLogger(project=self.cfg['wandb_project'],
-                                                    group = self.cfg['name'],
-                                                    config=arg_dict)
+                wandb_logger = L.loggers.WandbLogger(
+                    project=self.cfg['wandb_project'],
+                    group=self.cfg['name'],
+                    config=arg_dict,
+                    log_model=True
+                )
             except wandb.errors.CommError:
                 print('Hit wandb init error! Retrying without logging')
                 wandb_logger=None
 
         self.trainer = L.Trainer(deterministic=True, 
                         logger=wandb_logger,
-                        accelerator = self.cfg['accelerator'], devices= self.cfg['devices'],
+                        accelerator=self.cfg['accelerator'], 
+                        devices=self.cfg['devices'],
                         max_epochs=self.cfg['epochs'], 
-                        callbacks=callbacks,)
+                        callbacks=callbacks,
+                        log_every_n_steps=self.cfg.get('wandb_batch_log_freq', 50))
         
 
     def train(self, model, train_dl, val_dl):
@@ -88,7 +93,7 @@ class SAETraining:
         if model is not None:
             val_metrics = self.trainer.validate(model=model, dataloaders=val_dl)
         else:
-            val_metrics = self.trainer.validate(dataloaders = val_dl, ckpt_path='best')
+            val_metrics = self.trainer.validate(dataloaders=val_dl, ckpt_path='best')
         return(val_metrics)
 
     def test(self, test_dataloader, model=None):
