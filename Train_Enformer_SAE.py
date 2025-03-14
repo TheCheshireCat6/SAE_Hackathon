@@ -4,17 +4,21 @@ if __name__ == '__main__':
     ################### Mostly not model specific ##############
     ############################################################
     import sys
-    sys.path.append('./src')
+    sys.path.append('../src')
+
     import argparse
     import torch
-    from SAE_models import get_cfg, TopKSAE, VanillaSAE, JumpReLUSAE, BatchTopKSAE
-    from SAE_training import SAETraining
-    from torch.utils.data import DataLoader
     import numpy as np
     import json
     import os
     import yaml
-    
+
+    import sys
+    sys.path.append('./src')
+    from enformer_temp import EnformerEmbeddingsDataLoader, NumpyFilesDataset, EnformerWithEmbeddings
+    from SAE_models import get_cfg, TopKSAE, VanillaSAE, JumpReLUSAE, BatchTopKSAE
+    from SAE_training import SAETraining
+
     # Simple argument parser to get config file path
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=str, default='configs/test_config.yaml', 
@@ -61,26 +65,42 @@ if __name__ == '__main__':
     torch.manual_seed(cfg['seed'])
     np.random.seed(cfg['seed'])
 
-    class EnformerDataloader(DataLoader):
-        def __init__(self, cfg):
-            # cfg contains path            
-            super().__init__(cfg)
-            self.seqs, self.embed, self.pred = ...
+    # Use the new EnformerEmbeddingsDataLoader for loading data and extracting embeddings
+    device = 'cuda' if torch.cuda.is_available() and cfg.get('use_gpu', True) else 'cpu'
+    target_layer = cfg.get('target_layer', 'conv_tower.5.2.to_attn_logits')
+    batch_size = cfg.get('batch_size', 4)
 
-        def __len__(self):
-            return len(self.seqs)
+    # Get train/val/test file indices from config
+    train_indices = cfg.get('train_indices', None)  # e.g., "1-800" or [1, 2, 3, 4, 5]
+    val_indices = cfg.get('val_indices', None)      # e.g., "801-900"
+    test_indices = cfg.get('test_indices', None)    # e.g., "901-1000"
 
-        def __getitem__(self, idx):
-            return self.seqs[idx], self.embed[idx], self.pred[idx]
+    train_dl = EnformerEmbeddingsDataLoader(
+        data_config=cfg['train_loader'],
+        target_layer=target_layer,
+        batch_size=batch_size,
+        device=device,
+        file_indices=train_indices,
+        file_prefix=cfg.get('file_prefix', 'test')
+    )
 
+    val_dl = EnformerEmbeddingsDataLoader(
+        data_config=cfg['val_loader'],
+        target_layer=target_layer,
+        batch_size=batch_size,
+        device=device,
+        file_indices=val_indices,
+        file_prefix=cfg.get('file_prefix', 'test')
+    )
 
-    # Load input seqs, embeddings and model predictions (special Dataloader)
-    train_dl = EnformerDataloader(cfg['train_loader'])
-    #seqs, embed, pred = train_dl[0]
-
-    val_dl = EnformerDataloader(cfg['val_loader'])
-
-    test_dl  = EnformerDataloader(cfg['test_loader'])    
+    test_dl = EnformerEmbeddingsDataLoader(
+        data_config=cfg['test_loader'],
+        target_layer=target_layer,
+        batch_size=batch_size, 
+        device=device,
+        file_indices=test_indices,
+        file_prefix=cfg.get('file_prefix', 'test')
+    )
 
     ############################################################
     ################### 4. SAE Model setup #####################
@@ -110,15 +130,20 @@ if __name__ == '__main__':
     ################### Not Model specific #####################
     ############################################################
 
+    # Ensure the output directory exists
+    os.makedirs(cfg['outpath'], exist_ok=True)
+
     val_metrics = trainer.validate(val_dl)
 
     print(val_metrics)
-    with open(cfg['outpath'] + f"{cfg['name']}_{cfg['seed']}_val_metrics.json", 'w') as f:
+    val_metrics_path = os.path.join(cfg['outpath'], f"{cfg['name']}_{cfg['seed']}_val_metrics.json")
+    with open(val_metrics_path, 'w') as f:
         json.dump(val_metrics, f)
 
     test_metrics = trainer.test(test_dl)
 
     print(test_metrics)
-    with open(cfg['outpath'] + f"{cfg['name']}_{cfg['seed']}_test_metrics.json", 'w') as f:
+    test_metrics_path = os.path.join(cfg['outpath'], f"{cfg['name']}_{cfg['seed']}_test_metrics.json")
+    with open(test_metrics_path, 'w') as f:
         json.dump(test_metrics, f)
 

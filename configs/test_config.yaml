@@ -1,14 +1,22 @@
 # General training parameters
 seed: 49
-batch_size: 4096
-lr: 3e-4
+batch_size: 64
+lr: 0.0003
 l1_coeff: 0
 beta1: 0.9
 beta2: 0.99
 max_grad_norm: 100000
-act_size: 768
+act_size: 1536
 dict_size: 12288
-wandb_project: sparse_autoencoders
+
+# Weights & Biases configuration
+wandb_project: enformer_SAE
+name: enformer_sae_test  # Required for wandb logging to work
+# Additional optional wandb parameters
+wandb_entity: lemanczyk-marta  # Your username or team name
+wandb_tags: [enformer, sae]
+wandb_mode: online  # Options: online, offline, disabled
+
 input_unit_norm: false
 perf_log_freq: 1000
 sae_type: topk
@@ -20,7 +28,7 @@ include_checkpointing: true
 include_early_stopping: true
 track_LR: true
 epochs: 1000
-outpath: ./out/
+outpath: /grid/koo/home/lemanczyk/SAE_Hackathon/checkpoints
 
 # Warmstart parameters
 warmstart_batches: 0
@@ -52,11 +60,17 @@ aux_penalty: 0.03125  # 1/32
 bandwidth: 0.001
 
 # Enformer specific
-data_path: /grid/hackathon/data_norepl/enformer_data_npz
-train_data_path: null
-val_data_path: null
-test_data_path: null 
-data_batch_size: 32
+data_path: /grid/koo/home/lemanczyk/SAE_Hackathon/data/enformer_data_partitioned
+# Data loaders configuration
+train_loader: /grid/koo/home/lemanczyk/SAE_Hackathon/data/enformer_data_partitioned/human/train
+val_loader: /grid/koo/home/lemanczyk/SAE_Hackathon/data/enformer_data_partitioned/human/valid
+test_loader: /grid/koo/home/lemanczyk/SAE_Hackathon/data/enformer_data_partitioned/human/test
+#train_indices: [0, 1, 5, 6, 8, 11, 12, 13, 14, 16, 17, 18, 20, 21, 22, 26, 27, 28]   # Train files: test_1.npz through test_800.npz
+#val_indices: [4, 9, 10, 19, 23, 24, 25]    # Validation files: test_801.npz through test_900.npz
+#test_indices: [2, 3, 7, 15, 40, 51, 54]  # Test files: test_901.npz through test_1000.npz
+file_prefix: "test"       # Prefix for all files
+data_batch_size: 4
 num_workers: 4
-hook_layer: conv_tower.5.2.to_attn_logits
+target_layer: transformer.10.1.fn.4
+use_gpu: true  # Whether to use GPU for inference
 preload_activations: false 

@@ -15,23 +15,22 @@
 
 # This script expects two arguments:
 # 1. SAE architecture (vanilla, topk, jumprelu, batch_topk)
-# 2. Configuration index
-# Usage: sbatch --export=ARCH=vanilla,IDX=0 slurm_sae.sh
+# 2. Configuration file name
+# Usage: sbatch --export=ARCH=vanilla,CONFIG_FILE=test_config.yaml slurm_sae.sh
 
 eval "$(conda shell.bash hook)"
 conda activate architecture_search_env
 
 # Default values if not provided through environment variables
 ARCH=${ARCH:-topk}  # Default to topk
-IDX=${IDX:-0}       # Default to index 0
+CONFIG_FILE=${CONFIG_FILE:-test_config.yaml}  # Default to test_config.yaml
 
 # Print the configuration being used
-echo "Running with architecture: $ARCH, index: $IDX"
+echo "Running with architecture: $ARCH, config file: $CONFIG_FILE"
 
 # Run the training script with the specific configuration
 python Train_Enformer_SAE.py \
-    --base-config configs/base_enformer_config.yaml \
-    --sae-type $ARCH \
-    --override-config configs/$ARCH/$IDX.yaml
+    --config configs/$CONFIG_FILE \
+    --override-config configs/$ARCH.yaml
 
 echo "Training completed"
